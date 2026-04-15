@@ -1,0 +1,55 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Tenant {
+  id            String         @id @default(cuid())
+  nome          String
+  slug          String         @unique
+  telefone      String
+  ativo         Boolean        @default(true)
+  criadoEm      DateTime       @default(now())
+  profissionais Profissional[]
+  clientes      Cliente[]
+  agendamentos  Agendamento[]
+}
+
+model Profissional {
+  id           String        @id @default(cuid())
+  tenantId     String
+  nome         String
+  email        String
+  role         String        @default("atendente")
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  agendamentos Agendamento[]
+}
+
+model Cliente {
+  id           String        @id @default(cuid())
+  tenantId     String
+  nome         String
+  telefone     String
+  tenant       Tenant        @relation(fields: [tenantId], references: [id])
+  agendamentos Agendamento[]
+}
+
+model Agendamento {
+  id                 String       @id @default(cuid())
+  tenantId           String
+  clienteId          String
+  profissionalId     String
+  servico            String
+  dataHora           DateTime
+  status             String       @default("agendado")
+  tokenConfirm       String       @unique @default(cuid())
+  lembreteEnviadoEm  DateTime?
+  criadoEm           DateTime     @default(now())
+  tenant             Tenant       @relation(fields: [tenantId], references: [id])
+  cliente            Cliente      @relation(fields: [clienteId], references: [id])
+  profissional       Profissional @relation(fields: [profissionalId], references: [id])
+}
