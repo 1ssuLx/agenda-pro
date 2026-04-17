@@ -5,3 +5,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+module.exports = {
+  allowedDevOrigins: ['venomous-buddhism-trio.ngrok-free.dev'],
+}

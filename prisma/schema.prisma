@@ -1,9 +1,11 @@
-datasource db {
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // ✅ SEM url aqui — vai para o prisma.config.ts
 }
 
 model Tenant {
