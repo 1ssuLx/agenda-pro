@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { getTenantId } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
@@ -30,6 +31,20 @@ export async function GET() {
 }
 
 export async function PATCH(request: NextRequest) {
+  // --- DEBUG ---
+  const clerkUser = await currentUser();
+  console.log("[PATCH /api/tenant] clerkUser.id:", clerkUser?.id ?? "null");
+  console.log("[PATCH /api/tenant] clerkUser.email:", clerkUser?.primaryEmailAddress?.emailAddress ?? "null");
+
+  if (clerkUser) {
+    const profissional = await prisma.profissional.findFirst({
+      where: { email: clerkUser.primaryEmailAddress?.emailAddress ?? "" },
+      select: { id: true, tenantId: true, email: true },
+    });
+    console.log("[PATCH /api/tenant] profissional encontrado:", profissional);
+  }
+  // --- FIM DEBUG ---
+
   const { tenantId, error } = await resolveTenantId();
   if (error) return error;
 
@@ -70,7 +85,13 @@ export async function PATCH(request: NextRequest) {
     return errorResponse("Nenhum campo para atualizar", 400);
   }
 
-  const tenant = await prisma.tenant.update({ where: { id: tenantId! }, data });
+  let tenant;
+  try {
+    tenant = await prisma.tenant.update({ where: { id: tenantId! }, data });
+  } catch (err) {
+    console.error("[PATCH /api/tenant] Erro no prisma.update:", err);
+    return errorResponse("Erro ao atualizar as configurações", 500);
+  }
 
   return NextResponse.json({
     ...tenant,
