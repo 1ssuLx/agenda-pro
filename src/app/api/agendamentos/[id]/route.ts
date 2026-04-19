@@ -6,7 +6,7 @@ function errorResponse(message: string, status: number) {
   return NextResponse.json({ erro: message }, { status });
 }
 
-const STATUS_VALIDOS = ["agendado", "confirmado", "concluido", "cancelado"];
+const STATUS_VALIDOS = ["agendado", "confirmado", "concluido", "cancelado", "nao_compareceu"];
 
 type RouteContext = { params: Promise<{ id: string }> };
 
@@ -29,16 +29,20 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     return errorResponse("Corpo da requisição inválido", 400);
   }
 
-  const { status: novoStatus } = body as { status?: string };
+  const { status: novoStatus, dataHora } = body as { status?: string; dataHora?: string };
 
-  if (!novoStatus || typeof novoStatus !== "string") {
-    return errorResponse("O campo 'status' é obrigatório", 400);
+  if (!novoStatus && !dataHora) {
+    return errorResponse("Informe 'status' ou 'dataHora' para atualizar", 400);
   }
-  if (!STATUS_VALIDOS.includes(novoStatus)) {
+  if (novoStatus && !STATUS_VALIDOS.includes(novoStatus)) {
     return errorResponse(
       `Status inválido. Valores permitidos: ${STATUS_VALIDOS.join(", ")}`,
       400
     );
+  }
+  if (dataHora) {
+    const d = new Date(dataHora);
+    if (isNaN(d.getTime())) return errorResponse("'dataHora' não é uma data válida", 400);
   }
 
   const agendamento = await prisma.agendamento.findFirst({
@@ -51,7 +55,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
 
   const atualizado = await prisma.agendamento.update({
     where: { id },
-    data: { status: novoStatus },
+    data: {
+      ...(novoStatus ? { status: novoStatus } : {}),
+      ...(dataHora ? { dataHora: new Date(dataHora) } : {}),
+    },
     include: {
       cliente: { select: { id: true, nome: true, telefone: true } },
       profissional: { select: { id: true, nome: true, email: true } },
