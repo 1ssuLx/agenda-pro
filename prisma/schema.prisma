@@ -38,6 +38,7 @@ model Cliente {
   tenantId     String
   nome         String
   telefone     String
+  servicoPadrao String?
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
   agendamentos Agendamento[]
 }

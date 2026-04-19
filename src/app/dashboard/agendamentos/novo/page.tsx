@@ -18,7 +18,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-type ClienteEncontrado = { id: string; nome: string; telefone: string };
+type ClienteEncontrado = { id: string; nome: string; telefone: string; servicoPadrao: string | null };
 
 export default function NovoAgendamentoPage() {
   const router = useRouter();
@@ -67,6 +67,9 @@ export default function NovoAgendamentoPage() {
         if (lista.length > 0) {
           setClienteEncontrado(lista[0]);
           setValue("clienteId", lista[0].id, { shouldValidate: true });
+          if (lista[0].servicoPadrao) {
+            setValue("servico", lista[0].servicoPadrao, { shouldValidate: true });
+          }
         }
       } finally {
         setBuscando(false);

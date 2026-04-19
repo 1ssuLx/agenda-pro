@@ -25,6 +25,14 @@ export async function GET(request: NextRequest) {
       ...(telefone ? { telefone: { contains: telefone } } : {}),
     },
     orderBy: { nome: "asc" },
+    select: {
+      id: true,
+      nome: true,
+      telefone: true,
+      servicoPadrao: true,
+      tenantId: true,
+      _count: { select: { agendamentos: true } },
+    },
   });
 
   return NextResponse.json(clientes);
@@ -47,7 +55,11 @@ export async function POST(request: NextRequest) {
     return errorResponse("Corpo da requisição inválido", 400);
   }
 
-  const { nome, telefone } = body as { nome?: string; telefone?: string };
+  const { nome, telefone, servicoPadrao } = body as {
+    nome?: string;
+    telefone?: string;
+    servicoPadrao?: string;
+  };
 
   if (!nome || typeof nome !== "string" || nome.trim() === "") {
     return errorResponse("O campo 'nome' é obrigatório", 400);
@@ -72,6 +84,7 @@ export async function POST(request: NextRequest) {
       tenantId,
       nome: nome.trim(),
       telefone: telefone.trim(),
+      ...(servicoPadrao ? { servicoPadrao: servicoPadrao.trim() } : {}),
     },
   });
 
