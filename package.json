@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "vercel-build": "prisma generate && next build"
+    "vercel-build": "prisma generate && next build",
+    "trigger:deploy": "./node_modules/.bin/trigger deploy"
   },
   "dependencies": {
     "@clerk/nextjs": "^7.2.1",
@@ -39,6 +40,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@trigger.dev/build": "4.4.4",
+    "trigger.dev": "4.4.4",
     "@types/node": "^20",
     "@types/pg": "^8.20.0",
     "@types/react": "^19",
