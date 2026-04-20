@@ -3,7 +3,10 @@ const EVOLUTION_API_KEY = process.env.EVOLUTION_API_KEY!;
 const EVOLUTION_INSTANCE = process.env.EVOLUTION_INSTANCE!;
 
 export async function sendWhatsApp(telefone: string, mensagem: string) {
-  const numeroFormatado = telefone.replace(/\D/g, "").replace(/^0/, "55");
+  const apenasDigitos = telefone.replace(/\D/g, "");
+  const numeroFormatado = apenasDigitos.startsWith("55")
+    ? apenasDigitos
+    : `55${apenasDigitos}`;
 
   const response = await fetch(
     `${EVOLUTION_API_URL}/message/sendText/${EVOLUTION_INSTANCE}`,
