@@ -73,11 +73,19 @@ export default function ConfiguracoesPage() {
 
   async function handleSalvar() {
     if (!nome.trim()) { toast.error("O nome do estabelecimento não pode ser vazio"); nomeRef.current?.focus(); return; }
+    let tel = telefone.trim();
+    if (tel) {
+      if (!tel.startsWith("55")) tel = "55" + tel;
+      if (tel.length < 12 || tel.length > 13) {
+        toast.error("Telefone deve ter 12 ou 13 dígitos incluindo o código do país (55)");
+        return;
+      }
+    }
     setSalvando(true);
     const res = await fetch("/api/tenant", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ nome: nome.trim(), telefone: telefone.trim(), servicos, mensagemLembrete }),
+      body: JSON.stringify({ nome: nome.trim(), telefone: tel, servicos, mensagemLembrete }),
     });
     setSalvando(false);
     if (res.ok) {
@@ -122,9 +130,12 @@ export default function ConfiguracoesPage() {
             type="tel"
             value={telefone}
             onChange={(e) => setTelefone(e.target.value.replace(/\D/g, ""))}
-            placeholder="31999999999"
+            placeholder="5531999999999"
             className={inputClass}
           />
+          <p className="text-xs text-neutral-400">
+            Inclua o código do país (55) seguido do DDD e número
+          </p>
         </Field>
       </Section>
 

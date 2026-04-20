@@ -82,13 +82,18 @@ export default function NovoAgendamentoPage() {
       setErroCadastro("Informe o nome do cliente");
       return;
     }
+    let tel = telefone.startsWith("55") ? telefone : "55" + telefone;
+    if (tel.length < 12 || tel.length > 13) {
+      setErroCadastro("Telefone deve ter 12 ou 13 dígitos incluindo o código do país (55)");
+      return;
+    }
     setSalvandoCliente(true);
     setErroCadastro("");
     try {
       const res = await fetch("/api/clientes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nome: novoNome.trim(), telefone }),
+        body: JSON.stringify({ nome: novoNome.trim(), telefone: tel }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -148,9 +153,12 @@ export default function NovoAgendamentoPage() {
             type="tel"
             value={telefone}
             onChange={(e) => handleTelefoneChange(e.target.value)}
-            placeholder="31999999999"
+            placeholder="5531999999999"
             className={inputClass}
           />
+          <p className="mt-0.5 text-xs text-neutral-400">
+            Inclua o código do país (55) seguido do DDD e número
+          </p>
           {buscando && <p className="mt-1 text-xs text-neutral-400">Buscando…</p>}
           {clienteEncontrado && (
             <p className="mt-1 text-xs font-medium text-green-700">

@@ -88,8 +88,14 @@ export default function ClientesPage() {
       toast.error("O nome é obrigatório");
       return;
     }
-    if (!editando.telefone.trim()) {
+    let tel = editando.telefone.trim();
+    if (!tel) {
       toast.error("O telefone é obrigatório");
+      return;
+    }
+    if (!tel.startsWith("55")) tel = "55" + tel;
+    if (tel.length < 12 || tel.length > 13) {
+      toast.error("Telefone deve ter 12 ou 13 dígitos incluindo o código do país (55)");
       return;
     }
     setSalvando(true);
@@ -98,7 +104,7 @@ export default function ClientesPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nome: editando.nome.trim(),
-        telefone: editando.telefone.trim(),
+        telefone: tel,
         servicoPadrao: editando.servicoPadrao || null,
       }),
     });
@@ -197,9 +203,12 @@ export default function ClientesPage() {
                       telefone: e.target.value.replace(/\D/g, ""),
                     })
                   }
-                  placeholder="31999999999"
+                  placeholder="5531999999999"
                   className={inputClass}
                 />
+                <p className="text-xs text-neutral-400">
+                  Inclua o código do país (55) seguido do DDD e número
+                </p>
               </Field>
 
               <Field label="Serviço padrão">

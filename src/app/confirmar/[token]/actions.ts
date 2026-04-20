@@ -31,7 +31,8 @@ export async function confirmarAgendamento(id: string, token: string) {
       where: { id },
       include: {
         cliente: { select: { nome: true } },
-        profissional: { select: { nome: true, telefone: true } },
+        profissional: { select: { nome: true } },
+        tenant: { select: { nome: true, telefone: true } },
       },
     });
 
@@ -54,13 +55,13 @@ export async function confirmarAgendamento(id: string, token: string) {
       minute: "2-digit",
     });
 
-    if (agendamento.profissional.telefone) {
+    if (agendamento.tenant.telefone) {
       await sendWhatsApp(
-        agendamento.profissional.telefone,
+        agendamento.tenant.telefone,
         `✅ Confirmação de agendamento\n\nO cliente ${agendamento.cliente.nome} confirmou o agendamento de ${agendamento.servico} para ${data} às ${hora}.`
       );
     } else {
-      console.warn(`Profissional ${agendamento.profissional.nome} sem telefone cadastrado — WhatsApp não enviado.`);
+      console.warn(`Estabelecimento ${agendamento.tenant.nome} sem telefone cadastrado — WhatsApp não enviado.`);
     }
 
     revalidatePath(`/confirmar/${token}`);
@@ -77,7 +78,8 @@ export async function cancelarAgendamento(id: string, token: string) {
       where: { id },
       include: {
         cliente: { select: { nome: true } },
-        profissional: { select: { nome: true, telefone: true } },
+        profissional: { select: { nome: true } },
+        tenant: { select: { nome: true, telefone: true } },
       },
     });
 
@@ -100,13 +102,13 @@ export async function cancelarAgendamento(id: string, token: string) {
       minute: "2-digit",
     });
 
-    if (agendamento.profissional.telefone) {
+    if (agendamento.tenant.telefone) {
       await sendWhatsApp(
-        agendamento.profissional.telefone,
+        agendamento.tenant.telefone,
         `❌ Cancelamento de agendamento\n\nO cliente ${agendamento.cliente.nome} cancelou o agendamento de ${agendamento.servico} para ${data} às ${hora}.`
       );
     } else {
-      console.warn(`Profissional ${agendamento.profissional.nome} sem telefone cadastrado — WhatsApp não enviado.`);
+      console.warn(`Estabelecimento ${agendamento.tenant.nome} sem telefone cadastrado — WhatsApp não enviado.`);
     }
 
     revalidatePath(`/confirmar/${token}`);
