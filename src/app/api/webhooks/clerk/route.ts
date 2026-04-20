@@ -75,11 +75,21 @@ export async function POST(request: Request) {
     const fullName =
       [first_name, last_name].filter(Boolean).join(" ").trim() || "Sem nome";
 
-    const primaryEmail =
+    const primaryEmail = (
       email_addresses.find((e) => e.id === primary_email_address_id)
         ?.email_address ??
       email_addresses[0]?.email_address ??
-      "";
+      ""
+    ).toLowerCase();
+
+    const allowed = await prisma.whitelistEmail.findUnique({
+      where: { email: primaryEmail },
+    });
+
+    if (!allowed) {
+      console.warn(`[webhook/clerk] Email bloqueado (não está na whitelist): ${primaryEmail}`);
+      return NextResponse.json({ blocked: true }, { status: 200 });
+    }
 
     const telefone = phone_numbers?.[0]?.phone_number ?? "";
 

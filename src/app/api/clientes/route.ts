@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getTenantId } from "@/lib/auth";
+import { getTenant } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 function errorResponse(message: string, status: number) {
@@ -9,7 +9,8 @@ function errorResponse(message: string, status: number) {
 export async function GET(request: NextRequest) {
   let tenantId: string;
   try {
-    tenantId = await getTenantId();
+    const { tenant } = await getTenant();
+    tenantId = tenant.id;
   } catch (err: unknown) {
     const status = (err as { status?: number }).status ?? 401;
     const message = err instanceof Error ? err.message : "Não autenticado";
@@ -41,7 +42,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   let tenantId: string;
   try {
-    tenantId = await getTenantId();
+    const { tenant } = await getTenant();
+    tenantId = tenant.id;
   } catch (err: unknown) {
     const status = (err as { status?: number }).status ?? 401;
     const message = err instanceof Error ? err.message : "Não autenticado";

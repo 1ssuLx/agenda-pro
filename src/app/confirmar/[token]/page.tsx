@@ -1,5 +1,7 @@
+import { headers } from "next/headers";
 import { getAgendamentoByToken } from "./actions";
 import ConfirmarButtons from "./ConfirmarButtons";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 interface Props {
   params: Promise<{ token: string }>;
@@ -26,24 +28,43 @@ const STATUS_LABELS: Record<string, { titulo: string; descricao: string; cor: st
   },
 };
 
-export default async function ConfirmarPage({ params }: Props) {
-  const { token } = await params;
-  const { data: agendamento, error } = await getAgendamentoByToken(token);
+function PaginaErro({ titulo, mensagem }: { titulo: string; mensagem: string }) {
+  return (
+    <Layout>
+      <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-6 text-center">
+        <p className="text-4xl mb-3">🔍</p>
+        <p className="text-lg font-semibold text-yellow-800">{titulo}</p>
+        <p className="mt-2 text-sm text-yellow-700">{mensagem}</p>
+      </div>
+    </Layout>
+  );
+}
 
-  if (error || !agendamento) {
+export default async function ConfirmarPage({ params }: Props) {
+  const headersList = await headers();
+  const ip =
+    headersList.get("x-forwarded-for")?.split(",")[0].trim() ??
+    headersList.get("x-real-ip") ??
+    "unknown";
+
+  if (!checkRateLimit(ip)) {
     return (
-      <Layout>
-        <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-6 text-center">
-          <p className="text-4xl mb-3">🔍</p>
-          <p className="text-lg font-semibold text-yellow-800">
-            Link inválido ou expirado
-          </p>
-          <p className="mt-2 text-sm text-yellow-700">
-            Não encontramos nenhum agendamento para este link. Verifique se o
-            link está correto ou entre em contato com o estabelecimento.
-          </p>
-        </div>
-      </Layout>
+      <PaginaErro
+        titulo="Muitas tentativas"
+        mensagem="Aguarde um momento antes de tentar novamente."
+      />
+    );
+  }
+
+  const { token } = await params;
+  const { data: agendamento } = await getAgendamentoByToken(token);
+
+  if (!agendamento) {
+    return (
+      <PaginaErro
+        titulo="Link não encontrado"
+        mensagem="Não encontramos nenhum agendamento para este link. Verifique se o link está correto ou entre em contato com o estabelecimento."
+      />
     );
   }
 
@@ -59,6 +80,8 @@ export default async function ConfirmarPage({ params }: Props) {
       </Layout>
     );
   }
+
+  const primeiroNome = agendamento.cliente.nome.split(" ")[0];
 
   const dataHora = new Date(agendamento.dataHora);
   const dataFormatada = dataHora.toLocaleDateString("pt-BR", {
@@ -86,14 +109,11 @@ export default async function ConfirmarPage({ params }: Props) {
       </div>
 
       <div className="rounded-2xl border border-zinc-200 bg-zinc-50 divide-y divide-zinc-200">
-        <Row label="Cliente" value={agendamento.cliente.nome} />
+        <Row label="Cliente" value={primeiroNome} />
         <Row label="Serviço" value={agendamento.servico} />
-        <Row label="Profissional" value={agendamento.profissional.nome} />
         <Row
           label="Data"
-          value={
-            <span className="capitalize">{dataFormatada}</span>
-          }
+          value={<span className="capitalize">{dataFormatada}</span>}
         />
         <Row label="Horário" value={horaFormatada} />
       </div>

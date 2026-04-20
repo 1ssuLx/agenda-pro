@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -40,6 +41,12 @@ model Cliente {
   servicoPadrao String?
   tenant       Tenant        @relation(fields: [tenantId], references: [id])
   agendamentos Agendamento[]
+}
+
+model WhitelistEmail {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  criadoEm  DateTime @default(now())
 }
 
 model Agendamento {

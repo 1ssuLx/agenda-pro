@@ -8,20 +8,23 @@ export async function getAgendamentoByToken(token: string) {
   try {
     const agendamento = await prisma.agendamento.findUnique({
       where: { tokenConfirm: token },
-      include: {
-        cliente: { select: { nome: true, telefone: true } },
-        profissional: { select: { nome: true, telefone: true } },
+      select: {
+        id: true,
+        servico: true,
+        dataHora: true,
+        status: true,
+        cliente: { select: { nome: true } },
         tenant: { select: { nome: true } },
       },
     });
 
     if (!agendamento) {
-      return { data: null, error: "Agendamento não encontrado." };
+      return { data: null, error: "not_found" };
     }
 
     return { data: agendamento, error: null };
   } catch {
-    return { data: null, error: "Erro ao buscar agendamento." };
+    return { data: null, error: "not_found" };
   }
 }
 
