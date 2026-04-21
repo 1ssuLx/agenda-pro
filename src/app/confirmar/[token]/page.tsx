@@ -2,6 +2,7 @@ import { headers } from "next/headers";
 import { getAgendamentoByToken } from "./actions";
 import ConfirmarButtons from "./ConfirmarButtons";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { formatDate, formatTime } from "@/lib/date";
 
 interface Props {
   params: Promise<{ token: string }>;
@@ -83,20 +84,6 @@ export default async function ConfirmarPage({ params }: Props) {
 
   const primeiroNome = agendamento.cliente.nome.split(" ")[0];
 
-  const dataHora = new Date(agendamento.dataHora);
-  const dataFormatada = dataHora.toLocaleDateString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    weekday: "long",
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-  const horaFormatada = dataHora.toLocaleTimeString("pt-BR", {
-    timeZone: "America/Sao_Paulo",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
   return (
     <Layout>
       <div className="mb-2 text-center">
@@ -111,11 +98,8 @@ export default async function ConfirmarPage({ params }: Props) {
       <div className="rounded-2xl border border-zinc-200 bg-zinc-50 divide-y divide-zinc-200">
         <Row label="Cliente" value={primeiroNome} />
         <Row label="Serviço" value={agendamento.servico} />
-        <Row
-          label="Data"
-          value={<span className="capitalize">{dataFormatada}</span>}
-        />
-        <Row label="Horário" value={horaFormatada} />
+        <Row label="Data" value={formatDate(agendamento.dataHora)} />
+        <Row label="Horário" value={formatTime(agendamento.dataHora)} />
       </div>
 
       <ConfirmarButtons agendamentoId={agendamento.id} token={token} />

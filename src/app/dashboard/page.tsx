@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
-import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { startOfDay, endOfDay, subDays } from "date-fns";
 import { prisma } from "@/lib/prisma";
 import ConcluirButton from "@/components/dashboard/ConcluirButton";
+import { formatTime } from "@/lib/date";
 
 const TZ = "America/Sao_Paulo";
 
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
                 className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white px-4 py-3"
               >
                 <span className="w-12 shrink-0 text-sm font-semibold tabular-nums text-neutral-500">
-                  {format(toZonedTime(agendamento.dataHora, TZ), "HH:mm")}
+                  {formatTime(agendamento.dataHora)}
                 </span>
 
                 <div className="flex-1 min-w-0">

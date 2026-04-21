@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { format } from "date-fns";
 import { toZonedTime, fromZonedTime } from "date-fns-tz";
 import { startOfDay, endOfDay, addDays, startOfWeek, endOfWeek } from "date-fns";
 import { currentUser } from "@clerk/nextjs/server";
@@ -8,6 +7,7 @@ import { prisma } from "@/lib/prisma";
 import FilterBar from "@/components/dashboard/FilterBar";
 import AgendamentoActionsMenu from "@/components/dashboard/AgendamentoActionsMenu";
 import { Button } from "@/components/ui/button";
+import { formatTime } from "@/lib/date";
 
 const TZ = "America/Sao_Paulo";
 const PAGE_SIZE = 20;
@@ -136,14 +136,13 @@ export default async function AgendamentosPage({ searchParams }: Props) {
               label: ag.status,
               className: "bg-neutral-100 text-neutral-600",
             };
-            const dataZonada = toZonedTime(ag.dataHora, TZ);
             return (
               <div
                 key={ag.id}
                 className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white px-4 py-3"
               >
                 <span className="w-12 shrink-0 text-sm font-semibold tabular-nums text-neutral-500">
-                  {format(dataZonada, "HH:mm")}
+                  {formatTime(ag.dataHora)}
                 </span>
 
                 <div className="flex-1 min-w-0">

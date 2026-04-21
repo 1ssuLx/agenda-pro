@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { toUTC } from "@/lib/date";
 
 const schema = z.object({
   clienteId: z.string().min(1, "Selecione ou cadastre um cliente"),
@@ -113,7 +114,7 @@ export default function NovoAgendamentoPage() {
     if (!profissionalId) return;
     setErroApi("");
 
-    const dataHora = new Date(`${values.data}T${values.hora}`).toISOString();
+    const dataHora = toUTC(values.data, values.hora).toISOString();
 
     const res = await fetch("/api/agendamentos", {
       method: "POST",

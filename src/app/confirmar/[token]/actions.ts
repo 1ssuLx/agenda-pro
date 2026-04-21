@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { sendWhatsApp } from "@/lib/whatsapp";
+import { formatDate, formatTime } from "@/lib/date";
 
 export async function getAgendamentoByToken(token: string) {
   try {
@@ -52,11 +53,8 @@ export async function confirmarAgendamento(id: string, token: string) {
       data: { status: "confirmado" },
     });
 
-    const data = agendamento.dataHora.toLocaleDateString("pt-BR");
-    const hora = agendamento.dataHora.toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const data = formatDate(agendamento.dataHora);
+    const hora = formatTime(agendamento.dataHora);
 
     if (agendamento.tenant.telefone) {
       await sendWhatsApp(
@@ -99,11 +97,8 @@ export async function cancelarAgendamento(id: string, token: string) {
       data: { status: "cancelado" },
     });
 
-    const data = agendamento.dataHora.toLocaleDateString("pt-BR");
-    const hora = agendamento.dataHora.toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const data = formatDate(agendamento.dataHora);
+    const hora = formatTime(agendamento.dataHora);
 
     if (agendamento.tenant.telefone) {
       await sendWhatsApp(
