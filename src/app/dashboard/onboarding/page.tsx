@@ -109,7 +109,10 @@ export default function OnboardingPage() {
   async function finalizar() {
     setSalvando(true);
     setErro("");
-    const telefone = `${paisCodigo}${numeroTelefone.trim()}`;
+    const codigoPuro = paisCodigo.replace("+", "");
+    let numero = numeroTelefone.trim().replace(/\D/g, "");
+    if (numero.startsWith(codigoPuro)) numero = numero.slice(codigoPuro.length);
+    const telefone = `${codigoPuro}${numero}`;
     const res = await fetch("/api/tenant", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },

@@ -55,6 +55,11 @@ export default function ConfiguracoesPage() {
   const [editTelefone, setEditTelefone] = useState("");
   const [salvandoProf, setSalvandoProf] = useState(false);
 
+  const [adicionandoProf, setAdicionandoProf] = useState(false);
+  const [novoNomeProf, setNovoNomeProf] = useState("");
+  const [novoTelefoneProf, setNovoTelefoneProf] = useState("");
+  const [salvandoNovoProf, setSalvandoNovoProf] = useState(false);
+
   const nomeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -102,6 +107,28 @@ export default function ConfiguracoesPage() {
     } else {
       const err = await res.json();
       toast.error(err.erro ?? "Erro ao salvar profissional");
+    }
+  }
+
+  async function criarProfissional() {
+    if (!novoNomeProf.trim()) { toast.error("O nome do profissional é obrigatório"); return; }
+    setSalvandoNovoProf(true);
+    const res = await fetch("/api/profissionais", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: novoNomeProf.trim(), telefone: novoTelefoneProf.trim() || null }),
+    });
+    setSalvandoNovoProf(false);
+    if (res.ok) {
+      const criado = await res.json();
+      setProfissionais((prev) => [...prev, criado]);
+      setNovoNomeProf("");
+      setNovoTelefoneProf("");
+      setAdicionandoProf(false);
+      toast.success("Profissional adicionado!");
+    } else {
+      const err = await res.json();
+      toast.error(err.erro ?? "Erro ao adicionar profissional");
     }
   }
 
@@ -239,6 +266,46 @@ export default function ConfiguracoesPage() {
               )
             )}
           </ul>
+        )}
+
+        {adicionandoProf ? (
+          <div className="flex flex-col gap-3 rounded-xl border border-dashed border-neutral-200 p-4">
+            <p className="text-sm font-medium text-neutral-700">Novo profissional</p>
+            <Field label="Nome">
+              <input
+                type="text"
+                value={novoNomeProf}
+                onChange={(e) => setNovoNomeProf(e.target.value)}
+                placeholder="Ex: Carlos Souza"
+                className={inputClass}
+                autoFocus
+              />
+            </Field>
+            <Field label="Telefone (opcional)">
+              <input
+                type="tel"
+                value={novoTelefoneProf}
+                onChange={(e) => setNovoTelefoneProf(e.target.value.replace(/\D/g, ""))}
+                placeholder="5531999999999"
+                className={inputClass}
+              />
+            </Field>
+            <div className="flex gap-2">
+              <Button size="sm" onClick={criarProfissional} disabled={salvandoNovoProf}>
+                {salvandoNovoProf ? "Salvando…" : "Salvar"}
+              </Button>
+              <Button size="sm" variant="ghost" onClick={() => { setAdicionandoProf(false); setNovoNomeProf(""); setNovoTelefoneProf(""); }} disabled={salvandoNovoProf}>
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setAdicionandoProf(true)}
+            className="mt-1 text-sm font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+          >
+            + Adicionar profissional
+          </button>
         )}
       </Section>
 
