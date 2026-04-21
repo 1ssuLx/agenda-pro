@@ -40,11 +40,12 @@ export async function PATCH(request: NextRequest) {
     return errorResponse("Corpo da requisição inválido", 400);
   }
 
-  const { nome, telefone, servicos, mensagemLembrete } = body as {
+  const { nome, telefone, servicos, mensagemLembrete, onboardingCompleted } = body as {
     nome?: string;
     telefone?: string;
     servicos?: unknown;
     mensagemLembrete?: string;
+    onboardingCompleted?: boolean;
   };
 
   if (nome !== undefined && (typeof nome !== "string" || nome.trim() === "")) {
@@ -59,12 +60,16 @@ export async function PATCH(request: NextRequest) {
   if (mensagemLembrete !== undefined && typeof mensagemLembrete !== "string") {
     return errorResponse("O campo 'mensagemLembrete' deve ser uma string", 400);
   }
+  if (onboardingCompleted !== undefined && typeof onboardingCompleted !== "boolean") {
+    return errorResponse("O campo 'onboardingCompleted' deve ser boolean", 400);
+  }
 
-  const data: Record<string, string> = {};
-  if (nome !== undefined)             data.nome = nome.trim();
-  if (telefone !== undefined)         data.telefone = telefone.trim();
-  if (servicos !== undefined)         data.servicos = JSON.stringify(servicos);
-  if (mensagemLembrete !== undefined) data.mensagemLembrete = mensagemLembrete;
+  const data: Record<string, string | boolean> = {};
+  if (nome !== undefined)                data.nome = nome.trim();
+  if (telefone !== undefined)            data.telefone = telefone.trim();
+  if (servicos !== undefined)            data.servicos = JSON.stringify(servicos);
+  if (mensagemLembrete !== undefined)    data.mensagemLembrete = mensagemLembrete;
+  if (onboardingCompleted !== undefined) data.onboardingCompleted = onboardingCompleted;
 
   if (Object.keys(data).length === 0) {
     return errorResponse("Nenhum campo para atualizar", 400);

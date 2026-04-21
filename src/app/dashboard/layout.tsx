@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import SidebarNav from "@/components/dashboard/SidebarNav";
@@ -21,7 +22,17 @@ export default async function DashboardLayout({
 
   if (!profissional) redirect("/sign-in");
 
-  const tenantNome = profissional.tenant.nome;
+  const { tenant } = profissional;
+
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isOnboarding = pathname.startsWith("/dashboard/onboarding");
+
+  if (!tenant.onboardingCompleted && !isOnboarding) {
+    redirect("/dashboard/onboarding");
+  }
+
+  const tenantNome = tenant.nome;
 
   return (
     <div className="flex min-h-screen flex-col bg-neutral-50">
