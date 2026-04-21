@@ -19,6 +19,7 @@ import { toUTC } from "@/lib/date";
 
 const schema = z.object({
   clienteId: z.string().min(1, "Selecione ou cadastre um cliente"),
+  profissionalId: z.string().min(1, "Selecione um profissional"),
   servico: z.string().min(1, "Informe o serviço"),
   data: z.string().min(1, "Informe a data"),
   hora: z.string().min(1, "Informe o horário"),
@@ -28,11 +29,12 @@ type FormValues = z.infer<typeof schema>;
 
 type ClienteEncontrado = { id: string; nome: string; telefone: string; servicoPadrao: string | null };
 type Servico = { nome: string; duracao: number };
+type Profissional = { id: string; nome: string };
 
 export default function NovoAgendamentoPage() {
   const router = useRouter();
 
-  const [profissionalId, setProfissionalId] = useState<string | null>(null);
+  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [servicos, setServicos] = useState<Servico[]>([]);
   const [telefone, setTelefone] = useState("");
   const [buscando, setBuscando] = useState(false);
@@ -54,12 +56,12 @@ export default function NovoAgendamentoPage() {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   useEffect(() => {
-    fetch("/api/me")
-      .then((r) => r.json())
-      .then((d) => setProfissionalId(d.id ?? null));
     fetch("/api/tenant")
       .then((r) => r.json())
       .then((d) => setServicos(Array.isArray(d.servicos) ? d.servicos : []));
+    fetch("/api/profissionais")
+      .then((r) => r.json())
+      .then((list) => Array.isArray(list) && setProfissionais(list));
   }, []);
 
   function handleTelefoneChange(valor: string) {
@@ -124,7 +126,6 @@ export default function NovoAgendamentoPage() {
   }
 
   async function onSubmit(values: FormValues) {
-    if (!profissionalId) return;
     setErroApi("");
 
     const dataHora = toUTC(values.data, values.hora).toISOString();
@@ -134,7 +135,7 @@ export default function NovoAgendamentoPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         clienteId: values.clienteId,
-        profissionalId,
+        profissionalId: values.profissionalId,
         servico: values.servico,
         dataHora,
       }),
@@ -234,6 +235,34 @@ export default function NovoAgendamentoPage() {
           <input type="hidden" {...register("clienteId")} />
         </Field>
 
+        {/* Profissional */}
+        <Field label="Profissional" error={errors.profissionalId?.message}>
+          <Controller
+            control={control}
+            name="profissionalId"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full rounded-lg border-neutral-200 bg-white py-2.5 text-sm text-neutral-900 focus-visible:border-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-100">
+                  <SelectValue placeholder="Selecione um profissional" />
+                </SelectTrigger>
+                <SelectContent>
+                  {profissionais.length === 0 ? (
+                    <SelectItem value="__empty__" disabled>
+                      Nenhum profissional cadastrado — configure em Configurações
+                    </SelectItem>
+                  ) : (
+                    profissionais.map((p) => (
+                      <SelectItem key={p.id} value={p.id}>
+                        {p.nome}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            )}
+          />
+        </Field>
+
         {/* Serviço */}
         <Field label="Serviço" error={errors.servico?.message}>
           <Controller
@@ -276,7 +305,7 @@ export default function NovoAgendamentoPage() {
           <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{erroApi}</p>
         )}
 
-        <Button type="submit" disabled={isSubmitting || !profissionalId}>
+        <Button type="submit" disabled={isSubmitting}>
           {isSubmitting ? "Criando…" : "Criar agendamento"}
         </Button>
       </form>
