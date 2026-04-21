@@ -1,6 +1,7 @@
-import { task } from "@trigger.dev/sdk";
+import { task } from "@trigger.dev/sdk/v3";
 import { prisma } from "@/lib/prisma";
-import { buildLembreteMsg, sendWhatsApp } from "@/lib/whatsapp";
+import { sendWhatsApp } from "@/lib/whatsapp";
+import { formatDate, formatTime } from "@/lib/date";
 
 export const sendLembreteTask = task({
   id: "send-lembrete",
@@ -18,12 +19,9 @@ export const sendLembreteTask = task({
       return { skipped: true, reason: "agendamento cancelado" };
     }
 
-    const mensagem = buildLembreteMsg(
-      agendamento.cliente.nome,
-      agendamento.servico,
-      agendamento.dataHora,
-      agendamento.tokenConfirm
-);
+    const data = formatDate(agendamento.dataHora);
+    const hora = formatTime(agendamento.dataHora);
+    const mensagem = `Olá, ${agendamento.cliente.nome}! 👋\nLembrando do seu agendamento:\n📋 Serviço: ${agendamento.servico}\n📅 Data: ${data}\n⏰ Hora: ${hora}\n✅ Confirme presença: ${process.env.NEXT_PUBLIC_APP_URL}/confirmar/${agendamento.tokenConfirm}`;
 
     await sendWhatsApp(agendamento.cliente.telefone, mensagem);
 
