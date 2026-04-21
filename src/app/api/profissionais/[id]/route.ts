@@ -25,7 +25,7 @@ export async function PATCH(
     return NextResponse.json({ erro: "Corpo da requisição inválido" }, { status: 400 });
   }
 
-  const { nome } = body as { nome?: string };
+  const { nome, telefone } = body as { nome?: string; telefone?: string | null };
 
   if (!nome || typeof nome !== "string" || nome.trim() === "") {
     return NextResponse.json({ erro: "O campo 'nome' é obrigatório" }, { status: 400 });
@@ -39,10 +39,10 @@ export async function PATCH(
     return NextResponse.json({ erro: "Profissional não encontrado" }, { status: 404 });
   }
 
-  const updated = await prisma.profissional.update({
-    where: { id },
-    data: { nome: nome.trim() },
-  });
+  const data: { nome: string; telefone?: string | null } = { nome: nome.trim() };
+  if (telefone !== undefined) data.telefone = telefone ? telefone.trim() : null;
+
+  const updated = await prisma.profissional.update({ where: { id }, data });
 
   return NextResponse.json(updated);
 }

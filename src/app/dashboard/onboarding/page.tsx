@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Servico = { nome: string; duracao: number };
 
@@ -246,14 +247,14 @@ export default function OnboardingPage() {
 
               <div className="flex flex-col gap-3 rounded-xl border border-dashed border-neutral-200 p-4">
                 <p className="text-sm font-medium text-neutral-700">Adicionar serviço</p>
-                <div className="flex gap-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     value={servicoNome}
                     onChange={(e) => { setServicoNome(e.target.value); setErroServico(""); }}
                     onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
                     placeholder="Nome do serviço"
-                    className={`${inputClass} flex-1 min-w-0`}
+                    className={cn(inputClass, "flex-1 min-w-0")}
                   />
                   <input
                     type="number"
@@ -262,7 +263,7 @@ export default function OnboardingPage() {
                     onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
                     placeholder="Min"
                     min={1}
-                    className={`${inputClass} w-20 shrink-0`}
+                    className={cn(inputClass, "w-20 shrink-0")}
                   />
                   <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={adicionarServico}>
                     Adicionar

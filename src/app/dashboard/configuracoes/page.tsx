@@ -17,6 +17,12 @@ interface TenantData {
   mensagemLembrete: string;
 }
 
+interface Profissional {
+  id: string;
+  nome: string;
+  telefone: string | null;
+}
+
 const MENSAGEM_PADRAO =
   "Olá, {nome}! Lembrando do seu agendamento de {servico} em {data}. Confirme: {link}";
 
@@ -43,6 +49,12 @@ export default function ConfiguracoesPage() {
   const [novoServicoNome, setNovoServicoNome] = useState("");
   const [novoServicoDuracao, setNovoServicoDuracao] = useState("");
 
+  const [profissionais, setProfissionais] = useState<Profissional[]>([]);
+  const [editandoProfId, setEditandoProfId] = useState<string | null>(null);
+  const [editNome, setEditNome] = useState("");
+  const [editTelefone, setEditTelefone] = useState("");
+  const [salvandoProf, setSalvandoProf] = useState(false);
+
   const nomeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -55,7 +67,43 @@ export default function ConfiguracoesPage() {
         setMensagemLembrete(data.mensagemLembrete || MENSAGEM_PADRAO);
       })
       .finally(() => setLoading(false));
+
+    fetch("/api/profissionais")
+      .then((r) => r.json())
+      .then((list) => Array.isArray(list) && setProfissionais(list));
   }, []);
+
+  function iniciarEdicaoProf(prof: Profissional) {
+    setEditandoProfId(prof.id);
+    setEditNome(prof.nome);
+    setEditTelefone(prof.telefone ?? "");
+  }
+
+  function cancelarEdicaoProf() {
+    setEditandoProfId(null);
+    setEditNome("");
+    setEditTelefone("");
+  }
+
+  async function salvarProfissional(id: string) {
+    if (!editNome.trim()) { toast.error("O nome do profissional não pode ser vazio"); return; }
+    setSalvandoProf(true);
+    const res = await fetch(`/api/profissionais/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nome: editNome.trim(), telefone: editTelefone.trim() || null }),
+    });
+    setSalvandoProf(false);
+    if (res.ok) {
+      const updated = await res.json();
+      setProfissionais((prev) => prev.map((p) => p.id === id ? { ...p, nome: updated.nome, telefone: updated.telefone } : p));
+      cancelarEdicaoProf();
+      toast.success("Profissional atualizado!");
+    } else {
+      const err = await res.json();
+      toast.error(err.erro ?? "Erro ao salvar profissional");
+    }
+  }
 
   function adicionarServico() {
     const nomeT = novoServicoNome.trim();
@@ -139,7 +187,62 @@ export default function ConfiguracoesPage() {
         </Field>
       </Section>
 
-      {/* Seção 2 — Serviços */}
+      {/* Seção 2 — Profissionais */}
+      <Section titulo="Profissionais">
+        {profissionais.length === 0 ? (
+          <p className="text-sm text-neutral-400">Nenhum profissional encontrado.</p>
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {profissionais.map((prof) =>
+              editandoProfId === prof.id ? (
+                <li key={prof.id} className="flex flex-col gap-3 rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-3">
+                  <Field label="Nome">
+                    <input
+                      type="text"
+                      value={editNome}
+                      onChange={(e) => setEditNome(e.target.value)}
+                      className={inputClass}
+                      autoFocus
+                    />
+                  </Field>
+                  <Field label="Telefone">
+                    <input
+                      type="tel"
+                      value={editTelefone}
+                      onChange={(e) => setEditTelefone(e.target.value.replace(/\D/g, ""))}
+                      placeholder="5531999999999"
+                      className={inputClass}
+                    />
+                  </Field>
+                  <div className="flex gap-2">
+                    <Button size="sm" onClick={() => salvarProfissional(prof.id)} disabled={salvandoProf}>
+                      {salvandoProf ? "Salvando…" : "Salvar"}
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={cancelarEdicaoProf} disabled={salvandoProf}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </li>
+              ) : (
+                <li key={prof.id} className="flex items-center justify-between rounded-xl border border-neutral-200 bg-white px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-neutral-900">{prof.nome}</p>
+                    <p className="text-xs text-neutral-400">{prof.telefone ?? "Sem telefone"}</p>
+                  </div>
+                  <button
+                    onClick={() => iniciarEdicaoProf(prof)}
+                    className="text-xs font-medium text-neutral-600 hover:text-neutral-900 transition-colors"
+                  >
+                    Editar
+                  </button>
+                </li>
+              )
+            )}
+          </ul>
+        )}
+      </Section>
+
+      {/* Seção 3 — Serviços */}
       <Section titulo="Serviços">
         {servicos.length > 0 ? (
           <ul className="flex flex-col gap-2">
@@ -192,7 +295,7 @@ export default function ConfiguracoesPage() {
         </div>
       </Section>
 
-      {/* Seção 3 — Mensagem do lembrete */}
+      {/* Seção 4 — Mensagem do lembrete */}
       <Section titulo="Mensagem do lembrete">
         <p className="text-xs text-neutral-400">
           Variáveis disponíveis:{" "}
