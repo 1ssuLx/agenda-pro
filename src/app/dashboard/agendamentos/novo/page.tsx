@@ -3,11 +3,18 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toUTC } from "@/lib/date";
 
 const schema = z.object({
@@ -20,11 +27,13 @@ const schema = z.object({
 type FormValues = z.infer<typeof schema>;
 
 type ClienteEncontrado = { id: string; nome: string; telefone: string; servicoPadrao: string | null };
+type Servico = { nome: string; duracao: number };
 
 export default function NovoAgendamentoPage() {
   const router = useRouter();
 
   const [profissionalId, setProfissionalId] = useState<string | null>(null);
+  const [servicos, setServicos] = useState<Servico[]>([]);
   const [telefone, setTelefone] = useState("");
   const [buscando, setBuscando] = useState(false);
   const [clienteEncontrado, setClienteEncontrado] = useState<ClienteEncontrado | null>(null);
@@ -40,6 +49,7 @@ export default function NovoAgendamentoPage() {
     register,
     handleSubmit,
     setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
@@ -47,6 +57,9 @@ export default function NovoAgendamentoPage() {
     fetch("/api/me")
       .then((r) => r.json())
       .then((d) => setProfissionalId(d.id ?? null));
+    fetch("/api/tenant")
+      .then((r) => r.json())
+      .then((d) => setServicos(Array.isArray(d.servicos) ? d.servicos : []));
   }, []);
 
   function handleTelefoneChange(valor: string) {
@@ -223,11 +236,29 @@ export default function NovoAgendamentoPage() {
 
         {/* Serviço */}
         <Field label="Serviço" error={errors.servico?.message}>
-          <input
-            type="text"
-            placeholder="Ex: Corte de cabelo"
-            className={inputClass}
-            {...register("servico")}
+          <Controller
+            control={control}
+            name="servico"
+            render={({ field }) => (
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full rounded-lg border-neutral-200 bg-white py-2.5 text-sm text-neutral-900 focus-visible:border-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-100">
+                  <SelectValue placeholder="Selecione um serviço" />
+                </SelectTrigger>
+                <SelectContent>
+                  {servicos.length === 0 ? (
+                    <SelectItem value="__empty__" disabled>
+                      Nenhum serviço cadastrado — configure em Configurações
+                    </SelectItem>
+                  ) : (
+                    servicos.map((s) => (
+                      <SelectItem key={s.nome} value={s.nome}>
+                        {s.nome} ({s.duracao} min)
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            )}
           />
         </Field>
 
