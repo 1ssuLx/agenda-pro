@@ -14,8 +14,9 @@ model Tenant {
   telefone      String
   ativo         Boolean        @default(true)
   criadoEm      DateTime       @default(now())
-  servicos      String?
-  mensagemLembrete String?
+  servicos             String?
+  mensagemLembrete     String?
+  onboardingCompleted  Boolean  @default(false)
   profissionais Profissional[]
   clientes      Cliente[]
   agendamentos  Agendamento[]
