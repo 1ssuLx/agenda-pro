@@ -20,6 +20,7 @@ export default function OnboardingPage() {
 
   const [step, setStep] = useState(0);
   const [salvando, setSalvando] = useState(false);
+  const [isAvancar, setIsAvancar] = useState(false);
   const [erro, setErro] = useState("");
 
   // Etapa 1
@@ -97,11 +98,13 @@ export default function OnboardingPage() {
 
   async function avancar() {
     if (step === 1 && profissionalId) {
+      setIsAvancar(true);
       await fetch(`/api/profissionais/${profissionalId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ nome: nomeProfissional.trim() }),
       });
+      setIsAvancar(false);
     }
     setStep((s) => s + 1);
   }
@@ -334,8 +337,8 @@ export default function OnboardingPage() {
           </Button>
 
           {step < STEPS.length - 1 ? (
-            <Button onClick={avancar} disabled={!podeProsseguir()}>
-              Próximo →
+            <Button onClick={avancar} disabled={!podeProsseguir() || isAvancar}>
+              {isAvancar ? "Salvando…" : "Próximo →"}
             </Button>
           ) : (
             <Button onClick={finalizar} disabled={!podeProsseguir() || salvando}>

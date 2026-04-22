@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   const webhookSecret = process.env.CLERK_WEBHOOK_SECRET;
   if (!webhookSecret) {
     return NextResponse.json(
-      { error: "CLERK_WEBHOOK_SECRET not configured" },
+      { erro: "Configuração do servidor incompleta" },
       { status: 400 }
     );
   }
@@ -42,7 +42,7 @@ export async function POST(request: Request) {
 
   if (!svixId || !svixTimestamp || !svixSignature) {
     return NextResponse.json(
-      { error: "Missing svix headers" },
+      { erro: "Cabeçalhos da requisição ausentes" },
       { status: 400 }
     );
   }
@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     }) as UserCreatedPayload;
   } catch {
     return NextResponse.json(
-      { error: "Invalid webhook signature" },
+      { erro: "Assinatura da requisição inválida" },
       { status: 400 }
     );
   }
@@ -118,7 +118,7 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[webhook/clerk] Erro ao criar tenant/profissional:", err);
     return NextResponse.json(
-      { error: "Erro ao processar evento" },
+      { erro: "Erro ao processar o evento recebido" },
       { status: 400 }
     );
   }

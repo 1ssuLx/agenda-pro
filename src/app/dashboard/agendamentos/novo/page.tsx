@@ -41,6 +41,7 @@ export default function NovoAgendamentoPage() {
   const [clienteEncontrado, setClienteEncontrado] = useState<ClienteEncontrado | null>(null);
   const [mostrarCadastro, setMostrarCadastro] = useState(false);
   const [novoNome, setNovoNome] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [salvandoCliente, setSalvandoCliente] = useState(false);
   const [erroCadastro, setErroCadastro] = useState("");
   const [erroApi, setErroApi] = useState("");
@@ -126,6 +127,7 @@ export default function NovoAgendamentoPage() {
   }
 
   async function onSubmit(values: FormValues) {
+    setIsLoading(true);
     setErroApi("");
 
     const dataHora = toUTC(values.data, values.hora).toISOString();
@@ -141,6 +143,7 @@ export default function NovoAgendamentoPage() {
       }),
     });
 
+    setIsLoading(false);
     if (res.ok) {
       toast.success("Agendamento criado com sucesso!");
       router.push("/dashboard");
@@ -305,8 +308,8 @@ export default function NovoAgendamentoPage() {
           <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{erroApi}</p>
         )}
 
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Criando…" : "Criar agendamento"}
+        <Button type="submit" disabled={isLoading || isSubmitting}>
+          {isLoading || isSubmitting ? "Salvando…" : "Criar agendamento"}
         </Button>
       </form>
     </div>
