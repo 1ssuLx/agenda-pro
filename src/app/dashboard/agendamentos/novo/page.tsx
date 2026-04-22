@@ -16,6 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toUTC } from "@/lib/date";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const schema = z.object({
   clienteId: z.string().min(1, "Selecione ou cadastre um cliente"),
@@ -166,7 +171,7 @@ export default function NovoAgendamentoPage() {
 
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
         {/* Telefone */}
-        <Field label="Telefone do cliente">
+        <Field label="Telefone do cliente" tooltip="Digite apenas números com código do país. Ex: 5531999999999">
           <input
             type="tel"
             value={telefone}
@@ -239,7 +244,7 @@ export default function NovoAgendamentoPage() {
         </Field>
 
         {/* Profissional */}
-        <Field label="Profissional" error={errors.profissionalId?.message}>
+        <Field label="Profissional" error={errors.profissionalId?.message} tooltip="Gerencie as opções em Configurações">
           <Controller
             control={control}
             name="profissionalId"
@@ -267,7 +272,7 @@ export default function NovoAgendamentoPage() {
         </Field>
 
         {/* Serviço */}
-        <Field label="Serviço" error={errors.servico?.message}>
+        <Field label="Serviço" error={errors.servico?.message} tooltip="Gerencie as opções em Configurações">
           <Controller
             control={control}
             name="servico"
@@ -319,15 +324,33 @@ export default function NovoAgendamentoPage() {
 function Field({
   label,
   error,
+  tooltip,
   children,
 }: {
   label: string;
   error?: string;
+  tooltip?: string;
   children: React.ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-neutral-700">{label}</label>
+      <div className="flex items-center gap-1.5">
+        <label className="text-sm font-medium text-neutral-700">{label}</label>
+        {tooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className="flex h-4 w-4 items-center justify-center rounded-full bg-neutral-200 text-[10px] font-bold text-neutral-500 hover:bg-neutral-300 hover:text-neutral-700 transition-colors"
+                aria-label={`Ajuda: ${label}`}
+              >
+                ?
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{tooltip}</TooltipContent>
+          </Tooltip>
+        )}
+      </div>
       {children}
       {error && <p className="text-xs text-red-600">{error}</p>}
     </div>

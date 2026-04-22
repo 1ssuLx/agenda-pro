@@ -1,7 +1,7 @@
 import { task } from "@trigger.dev/sdk/v3";
 import { prisma } from "@/lib/prisma";
 import { sendWhatsApp } from "@/lib/whatsapp";
-import { formatDate, formatTime } from "@/lib/date";
+import { formatDate, formatDateTime, formatTime } from "@/lib/date";
 
 export const sendLembreteTask = task({
   id: "send-lembrete",
@@ -19,9 +19,24 @@ export const sendLembreteTask = task({
       return { skipped: true, reason: "agendamento cancelado" };
     }
 
-    const data = formatDate(agendamento.dataHora);
-    const hora = formatTime(agendamento.dataHora);
-    const mensagem = `Olá, ${agendamento.cliente.nome}! 👋\nLembrando do seu agendamento:\n📋 Serviço: ${agendamento.servico}\n👤 Profissional: ${agendamento.profissional.nome}\n📅 Data: ${data}\n⏰ Hora: ${hora}\n✅ Confirme presença: ${process.env.NEXT_PUBLIC_APP_URL}/confirmar/${agendamento.tokenConfirm}`;
+    const tenant = await prisma.tenant.findUnique({
+      where: { id: agendamento.profissional.tenantId },
+    });
+
+    const link = `${process.env.NEXT_PUBLIC_APP_URL}/confirmar/${agendamento.tokenConfirm}`;
+    let mensagem: string;
+
+    if (tenant?.mensagemLembrete) {
+      mensagem = tenant.mensagemLembrete
+        .replace(/\{nome\}/g, agendamento.cliente.nome)
+        .replace(/\{servico\}/g, agendamento.servico)
+        .replace(/\{data\}/g, formatDateTime(agendamento.dataHora))
+        .replace(/\{link\}/g, link);
+    } else {
+      const data = formatDate(agendamento.dataHora);
+      const hora = formatTime(agendamento.dataHora);
+      mensagem = `Olá, ${agendamento.cliente.nome}! 👋\nLembrando do seu agendamento:\n📋 Serviço: ${agendamento.servico}\n👤 Profissional: ${agendamento.profissional.nome}\n📅 Data: ${data}\n⏰ Hora: ${hora}\n✅ Confirme presença: ${link}`;
+    }
 
     await sendWhatsApp(agendamento.cliente.telefone, mensagem);
 
