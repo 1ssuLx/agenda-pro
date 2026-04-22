@@ -102,6 +102,8 @@ export async function POST(request: Request) {
         nome: fullName,
         slug,
         telefone,
+        mensagemLembrete:
+          "Olá, {nome}! 👋\nLembrando do seu agendamento:\n🍽️ Serviço: {servico}\n👤 Profissional: {profissional}\n📅 Data: {data}\n✅ Confirme presença: {link}",
       },
     });
 

@@ -366,7 +366,7 @@ export default function ConfiguracoesPage() {
       <Section titulo="Mensagem do lembrete">
         <p className="text-xs text-neutral-400">
           Variáveis disponíveis:{" "}
-          {["{nome}", "{servico}", "{data}", "{link}"].map((v) => (
+          {["{nome}", "{servico}", "{profissional}", "{data}", "{link}"].map((v) => (
             <code
               key={v}
               className="mx-0.5 rounded bg-neutral-100 px-1 py-0.5 font-mono text-neutral-600"

@@ -30,6 +30,7 @@ export const sendLembreteTask = task({
       mensagem = tenant.mensagemLembrete
         .replace(/\{nome\}/g, agendamento.cliente.nome)
         .replace(/\{servico\}/g, agendamento.servico)
+        .replace(/\{profissional\}/g, agendamento.profissional.nome)
         .replace(/\{data\}/g, formatDateTime(agendamento.dataHora))
         .replace(/\{link\}/g, link);
     } else {
