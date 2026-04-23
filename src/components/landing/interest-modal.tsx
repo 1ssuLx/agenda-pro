@@ -179,7 +179,7 @@ export function InterestModal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="btn-shine mt-2 flex items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-medium text-black shadow-[0_10px_30px_rgba(34,197,94,0.25)] transition-opacity disabled:opacity-70"
+                      className="btn-shine mt-2 flex items-center justify-center gap-2 rounded-xl px-5 py-4 text-sm font-medium text-white shadow-[0_10px_30px_rgba(34,197,94,0.25)] transition-opacity disabled:opacity-50"
                     >
                       {loading ? "Salvando…" : "Quero minha vaga →"}
                     </button>

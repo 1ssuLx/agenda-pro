@@ -128,3 +128,23 @@
     @apply font-sans;
   }
 }
+
+.btn-shine {
+  background-color: #22c55e;
+  color: #ffffff !important;
+  font-weight: 600;
+  transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-shine:hover {
+  background-color: #16a34a;
+}
+
+.btn-shine:active {
+  background-color: #15803d;
+}
+
+.btn-shine:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

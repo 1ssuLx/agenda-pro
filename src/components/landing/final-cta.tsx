@@ -28,7 +28,7 @@ export function FinalCTA() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="btn-shine inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-black shadow-[0_20px_60px_rgba(34,197,94,0.4)]"
+            className="btn-shine inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white shadow-[0_20px_60px_rgba(34,197,94,0.4)]"
           >
             Garantir minha vaga grátis →
           </button>

@@ -83,7 +83,7 @@ export function Pricing() {
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="btn-shine mt-10 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-medium text-black shadow-[0_20px_60px_rgba(34,197,94,0.3)]"
+                className="btn-shine mt-10 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-medium text-white shadow-[0_20px_60px_rgba(34,197,94,0.3)]"
               >
                 Começar 30 dias grátis →
               </button>

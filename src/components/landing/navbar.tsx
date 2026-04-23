@@ -64,7 +64,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="btn-shine rounded-full px-4 py-2 text-sm font-medium text-black"
+              className="btn-shine rounded-full px-4 py-2 text-sm font-medium text-white"
             >
               Testar grátis
             </button>
@@ -142,7 +142,7 @@ export function Navbar() {
                     setMobileOpen(false);
                     setOpen(true);
                   }}
-                  className="btn-shine rounded-full px-6 py-3 text-sm font-medium text-black"
+                  className="btn-shine rounded-full px-6 py-3 text-sm font-medium text-white"
                 >
                   Testar grátis
                 </button>
