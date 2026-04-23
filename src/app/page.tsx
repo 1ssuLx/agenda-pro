@@ -1,7 +1,6 @@
 import { InterestProvider } from "@/components/landing/interest-context";
 import { InterestModal } from "@/components/landing/interest-modal";
 import { LenisProvider } from "@/components/landing/lenis-provider";
-import { CustomCursor } from "@/components/landing/custom-cursor";
 import { NoiseOverlay } from "@/components/landing/noise";
 import { Navbar } from "@/components/landing/navbar";
 import { Hero } from "@/components/landing/hero";
@@ -19,8 +18,7 @@ export default function Home() {
   return (
     <InterestProvider>
       <LenisProvider />
-      <CustomCursor />
-      <NoiseOverlay />
+<NoiseOverlay />
       <Navbar />
       <main className="relative flex flex-1 flex-col">
         <Hero />

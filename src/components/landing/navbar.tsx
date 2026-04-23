@@ -56,7 +56,7 @@ export function Navbar() {
           {/* Desktop CTAs */}
           <div className="hidden items-center gap-2 md:flex">
             <Link
-              href="/sign-in"
+              href="/dashboard"
               className="rounded-full px-4 py-2 text-sm text-[#a3a3a3] transition-colors hover:text-white"
             >
               Entrar
@@ -130,7 +130,7 @@ export function Navbar() {
               ))}
               <div className="mt-6 flex flex-col items-center gap-3">
                 <Link
-                  href="/sign-in"
+                  href="/dashboard"
                   onClick={() => setMobileOpen(false)}
                   className="rounded-full border border-white/10 px-6 py-3 text-sm text-white"
                 >
