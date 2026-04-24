@@ -19,6 +19,10 @@ export const sendLembreteTask = task({
       return { skipped: true, reason: "agendamento cancelado" };
     }
 
+    if (agendamento.dataHora <= new Date()) {
+      return { skipped: true, reason: "horário já passou" };
+    }
+
     const tenant = await prisma.tenant.findUnique({
       where: { id: agendamento.profissional.tenantId },
     });

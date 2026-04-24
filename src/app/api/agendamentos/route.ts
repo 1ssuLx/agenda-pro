@@ -133,13 +133,31 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  const dataHoraLembrete = new Date(agendamento.dataHora.getTime() - 24 * 60 * 60 * 1000);
+  const diffMs = agendamento.dataHora.getTime() - Date.now();
+  const umDia = 24 * 60 * 60 * 1000;
 
-  if (dataHoraLembrete > new Date()) {
-    await sendLembreteTask.trigger(
+  let triggerId: string | null = null;
+  if (diffMs > umDia) {
+    const dataHoraLembrete = new Date(agendamento.dataHora.getTime() - umDia);
+    const handle = await sendLembreteTask.trigger(
       { agendamentoId: agendamento.id },
       { delay: dataHoraLembrete }
     );
+    triggerId = handle.id;
+  } else if (diffMs > 0) {
+    const em2min = new Date(Date.now() + 2 * 60 * 1000);
+    const handle = await sendLembreteTask.trigger(
+      { agendamentoId: agendamento.id },
+      { delay: em2min }
+    );
+    triggerId = handle.id;
+  }
+
+  if (triggerId) {
+    await prisma.agendamento.update({
+      where: { id: agendamento.id },
+      data: { triggerId },
+    });
   }
 
   return NextResponse.json(agendamento, { status: 201 });

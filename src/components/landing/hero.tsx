@@ -123,7 +123,7 @@ export function Hero() {
                   ✓ Sim, confirmo
                 </motion.div>
                 <div className="flex-1 rounded-xl border border-white/10 px-4 py-3 text-center text-sm text-[#a3a3a3]">
-                  Reagendar
+                  Cancelar
                 </div>
               </div>
             </div>

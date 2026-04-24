@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getTenant } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { sendLembreteTask } from "@/trigger/send-lembrete";
 
 function errorResponse(message: string, status: number) {
   return NextResponse.json({ erro: message }, { status });
@@ -65,6 +66,36 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       profissional: { select: { id: true, nome: true, email: true } },
     },
   });
+
+  if (dataHora) {
+    const novaDataHora = new Date(dataHora);
+    const diffMs = novaDataHora.getTime() - Date.now();
+    const umDia = 24 * 60 * 60 * 1000;
+
+    let triggerId: string | null = null;
+    if (diffMs > umDia) {
+      const dataHoraLembrete = new Date(novaDataHora.getTime() - umDia);
+      const handle = await sendLembreteTask.trigger(
+        { agendamentoId: id },
+        { delay: dataHoraLembrete }
+      );
+      triggerId = handle.id;
+    } else if (diffMs > 0) {
+      const em2min = new Date(Date.now() + 2 * 60 * 1000);
+      const handle = await sendLembreteTask.trigger(
+        { agendamentoId: id },
+        { delay: em2min }
+      );
+      triggerId = handle.id;
+    }
+
+    if (triggerId) {
+      await prisma.agendamento.update({
+        where: { id },
+        data: { triggerId },
+      });
+    }
+  }
 
   return NextResponse.json(atualizado);
 }

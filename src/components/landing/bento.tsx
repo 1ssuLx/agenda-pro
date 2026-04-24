@@ -39,7 +39,7 @@ export function Bento() {
           className="mx-auto max-w-3xl text-center font-serif text-5xl leading-[1.05] text-white sm:text-6xl"
         >
           Tudo que você precisa.{" "}
-          <em className="italic text-[#22c55e]">Nada que você não.</em>
+          <em className="italic text-[#22c55e]">Nada a mais.</em>
         </motion.h2>
 
         <div className="mt-20 grid gap-5 md:grid-cols-6 md:grid-rows-[auto_auto]">
