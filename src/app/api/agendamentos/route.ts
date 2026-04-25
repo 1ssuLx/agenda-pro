@@ -8,7 +8,6 @@ function errorResponse(message: string, status: number) {
   return NextResponse.json({ erro: message }, { status });
 }
 
-const INTERVALO_MINUTOS = 30;
 
 export async function GET(request: NextRequest) {
   let tenantId: string;
@@ -112,21 +111,44 @@ export async function POST(request: NextRequest) {
   if (!cliente) return errorResponse("Cliente não encontrado neste estabelecimento", 404);
   if (!profissional) return errorResponse("Profissional não encontrado neste estabelecimento", 404);
 
-  const janela = INTERVALO_MINUTOS * 60 * 1000;
-  const inicio = new Date(dataHoraDate.getTime() - janela);
-  const fim = new Date(dataHoraDate.getTime() + janela);
+  // ── Verificação de conflito de horário ───────────────────────────────────
+  // Dois agendamentos conflitam quando seus intervalos se sobrepõem:
+  //   novoInicio < exFim  E  novoFim > exInicio
+  const novoInicio = dataHoraDate.getTime();
+  const novoFim    = novoInicio + duracao * 60 * 1000;
+  const JANELA_MS  = 4 * 60 * 60 * 1000; // ±4h para limitar o volume da query
 
-  const conflito = await prisma.agendamento.findFirst({
+  const candidatos = await prisma.agendamento.findMany({
     where: {
       tenantId,
       profissionalId,
       status: { notIn: ["cancelado"] },
-      dataHora: { gte: inicio, lte: fim },
+      dataHora: {
+        gte: new Date(novoInicio - JANELA_MS),
+        lte: new Date(novoInicio + JANELA_MS),
+      },
     },
+    select: { dataHora: true, duracaoMinutos: true },
+  });
+
+  const conflito = candidatos.find((ag) => {
+    const exInicio = ag.dataHora.getTime();
+    const exFim    = exInicio + ag.duracaoMinutos * 60 * 1000;
+    return novoInicio < exFim && novoFim > exInicio;
   });
 
   if (conflito) {
-    return errorResponse("Já existe um agendamento neste horário para este profissional", 409);
+    const exFimDate = new Date(conflito.dataHora.getTime() + conflito.duracaoMinutos * 60 * 1000);
+    const fmtHora = (d: Date) =>
+      new Intl.DateTimeFormat("pt-BR", {
+        timeZone: "America/Sao_Paulo",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(d);
+    return errorResponse(
+      `O profissional já tem um agendamento das ${fmtHora(conflito.dataHora)} às ${fmtHora(exFimDate)}. O próximo horário disponível é a partir das ${fmtHora(exFimDate)}.`,
+      409
+    );
   }
 
   const agendamento = await prisma.agendamento.create({
