@@ -60,6 +60,7 @@ model Agendamento {
   tokenConfirm       String       @unique @default(cuid())
   lembreteEnviadoEm  DateTime?
   triggerId          String?
+  duracaoMinutos     Int          @default(60)
   criadoEm           DateTime     @default(now())
   tenant             Tenant       @relation(fields: [tenantId], references: [id])
   cliente            Cliente      @relation(fields: [clienteId], references: [id])

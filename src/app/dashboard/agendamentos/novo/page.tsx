@@ -41,6 +41,7 @@ export default function NovoAgendamentoPage() {
 
   const [profissionais, setProfissionais] = useState<Profissional[]>([]);
   const [servicos, setServicos] = useState<Servico[]>([]);
+  const [duracaoMinutos, setDuracaoMinutos] = useState(60);
   const [telefone, setTelefone] = useState("");
   const [buscando, setBuscando] = useState(false);
   const [clienteEncontrado, setClienteEncontrado] = useState<ClienteEncontrado | null>(null);
@@ -145,6 +146,7 @@ export default function NovoAgendamentoPage() {
         profissionalId: values.profissionalId,
         servico: values.servico,
         dataHora,
+        duracaoMinutos,
       }),
     });
 
@@ -277,7 +279,14 @@ export default function NovoAgendamentoPage() {
             control={control}
             name="servico"
             render={({ field }) => (
-              <Select value={field.value} onValueChange={field.onChange}>
+              <Select
+                value={field.value}
+                onValueChange={(value) => {
+                  field.onChange(value);
+                  const found = servicos.find((s) => s.nome === value);
+                  setDuracaoMinutos(found?.duracao ?? 60);
+                }}
+              >
                 <SelectTrigger className="w-full rounded-lg border-neutral-200 bg-white py-2.5 text-sm text-neutral-900 focus-visible:border-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-100">
                   <SelectValue placeholder="Selecione um serviço" />
                 </SelectTrigger>

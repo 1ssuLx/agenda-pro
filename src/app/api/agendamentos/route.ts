@@ -22,16 +22,24 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const data = searchParams.get("data");
+  const data   = searchParams.get("data");
+  const inicio = searchParams.get("inicio");
+  const fim    = searchParams.get("fim");
 
   const where: Record<string, unknown> = { tenantId };
 
   if (data) {
-    const inicio = new Date(data);
-    inicio.setHours(0, 0, 0, 0);
-    const fim = new Date(data);
-    fim.setHours(23, 59, 59, 999);
-    where.dataHora = { gte: inicio, lte: fim };
+    const ini = new Date(data);
+    ini.setHours(0, 0, 0, 0);
+    const end = new Date(data);
+    end.setHours(23, 59, 59, 999);
+    where.dataHora = { gte: ini, lte: end };
+  } else if (inicio && fim) {
+    const ini = new Date(inicio);
+    ini.setHours(0, 0, 0, 0);
+    const end = new Date(fim);
+    end.setHours(23, 59, 59, 999);
+    where.dataHora = { gte: ini, lte: end };
   }
 
   const agendamentos = await prisma.agendamento.findMany({
@@ -64,12 +72,18 @@ export async function POST(request: NextRequest) {
     return errorResponse("Corpo da requisição inválido", 400);
   }
 
-  const { clienteId, profissionalId, servico, dataHora } = body as {
+  const { clienteId, profissionalId, servico, dataHora, duracaoMinutos } = body as {
     clienteId?: string;
     profissionalId?: string;
     servico?: string;
     dataHora?: string;
+    duracaoMinutos?: number;
   };
+
+  const duracao =
+    typeof duracaoMinutos === "number" && duracaoMinutos > 0
+      ? Math.round(duracaoMinutos)
+      : 60;
 
   if (!clienteId || typeof clienteId !== "string") {
     return errorResponse("O campo 'clienteId' é obrigatório", 400);
@@ -126,6 +140,7 @@ export async function POST(request: NextRequest) {
       dataHora: dataHoraDate,
       status: "agendado",
       tokenConfirm: createId(),
+      duracaoMinutos: duracao,
     },
     include: {
       cliente: { select: { id: true, nome: true, telefone: true } },
