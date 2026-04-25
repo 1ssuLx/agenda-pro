@@ -6,6 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Home01Icon,
   Calendar01Icon,
+  Calendar03Icon,
   UserGroup02Icon,
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
 const links = [
   { href: "/dashboard", label: "Início", icon: Home01Icon },
   { href: "/dashboard/agendamentos", label: "Agendamentos", icon: Calendar01Icon },
+  { href: "/dashboard/calendario", label: "Calendário", icon: Calendar03Icon },
   { href: "/dashboard/clientes", label: "Clientes", icon: UserGroup02Icon },
   { href: "/dashboard/configuracoes", label: "Configurações", icon: Settings01Icon },
 ];

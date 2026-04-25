@@ -5,20 +5,11 @@ import { startOfDay, endOfDay, addDays, startOfWeek, endOfWeek } from "date-fns"
 import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import FilterBar from "@/components/dashboard/FilterBar";
-import AgendamentoActionsMenu from "@/components/dashboard/AgendamentoActionsMenu";
+import AgendamentoCard from "@/components/dashboard/AgendamentoCard";
 import { Button } from "@/components/ui/button";
-import { formatTime } from "@/lib/date";
 
 const TZ = "America/Sao_Paulo";
 const PAGE_SIZE = 20;
-
-const STATUS_BADGE: Record<string, { label: string; className: string }> = {
-  agendado:       { label: "Agendado",       className: "bg-neutral-100 text-neutral-600" },
-  confirmado:     { label: "Confirmado",     className: "bg-green-100 text-green-700" },
-  cancelado:      { label: "Cancelado",      className: "bg-red-100 text-red-700" },
-  concluido:      { label: "Concluído",      className: "bg-blue-100 text-blue-700" },
-  nao_compareceu: { label: "Não compareceu", className: "bg-orange-100 text-orange-700" },
-};
 
 function calcIntervalo(periodo: string) {
   const agora = toZonedTime(new Date(), TZ);
@@ -82,7 +73,10 @@ export default async function AgendamentosPage({ searchParams }: Props) {
   const [agendamentos, total] = await Promise.all([
     prisma.agendamento.findMany({
       where,
-      include: { cliente: { select: { nome: true } } },
+      include: {
+        cliente: { select: { nome: true, telefone: true } },
+        profissional: { select: { nome: true } },
+      },
       orderBy: { dataHora: "asc" },
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
@@ -131,35 +125,19 @@ export default async function AgendamentosPage({ searchParams }: Props) {
         </div>
       ) : (
         <div className="flex flex-col gap-2">
-          {agendamentos.map((ag) => {
-            const badge = STATUS_BADGE[ag.status] ?? {
-              label: ag.status,
-              className: "bg-neutral-100 text-neutral-600",
-            };
-            return (
-              <div
-                key={ag.id}
-                className="flex items-center gap-4 rounded-xl border border-neutral-200 bg-white px-4 py-3"
-              >
-                <span className="w-12 shrink-0 text-sm font-semibold tabular-nums text-neutral-500">
-                  {formatTime(ag.dataHora)}
-                </span>
-
-                <div className="flex-1 min-w-0">
-                  <p className="truncate text-sm font-medium text-neutral-900">
-                    {ag.cliente.nome}
-                  </p>
-                  <p className="truncate text-xs text-neutral-400">{ag.servico}</p>
-                </div>
-
-                <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}>
-                  {badge.label}
-                </span>
-
-                <AgendamentoActionsMenu agendamentoId={ag.id} />
-              </div>
-            );
-          })}
+          {agendamentos.map((ag) => (
+            <AgendamentoCard
+              key={ag.id}
+              ag={{
+                id: ag.id,
+                dataHoraIso: ag.dataHora.toISOString(),
+                status: ag.status,
+                servico: ag.servico,
+                cliente: { nome: ag.cliente.nome, telefone: ag.cliente.telefone },
+                profissional: { nome: ag.profissional.nome },
+              }}
+            />
+          ))}
         </div>
       )}
 

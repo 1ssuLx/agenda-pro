@@ -79,14 +79,14 @@ export default function FilterBar({ periodo, status, busca }: Props) {
             "rounded-lg border px-2 py-1.5 text-sm transition-colors outline-none focus:border-neutral-400",
             isCustomDate
               ? "border-neutral-900 bg-neutral-900 text-white"
-              : "border-neutral-200 bg-neutral-100 text-neutral-600"
+              : "border-neutral-200 bg-neutral-100 text-neutral-900"
           )}
         />
       </div>
 
       {/* Status select */}
       <Select value={status} onValueChange={(val) => navigate({ status: val })}>
-        <SelectTrigger className="w-44">
+        <SelectTrigger className="w-44 text-neutral-900">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -110,7 +110,7 @@ export default function FilterBar({ periodo, status, busca }: Props) {
             navigate({ busca: e.target.value });
           }, 300);
         }}
-        className="h-9 rounded-4xl border border-neutral-200 bg-neutral-100 px-3 text-sm outline-none placeholder:text-neutral-400 focus:border-neutral-400 transition-colors"
+        className="h-9 rounded-4xl border border-neutral-200 bg-neutral-100 px-3 text-sm text-neutral-900 outline-none placeholder:text-neutral-400 focus:border-neutral-400 transition-colors"
       />
     </div>
   );
