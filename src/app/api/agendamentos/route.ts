@@ -80,10 +80,8 @@ export async function POST(request: NextRequest) {
     duracaoMinutos?: number;
   };
 
-  const duracao =
-    typeof duracaoMinutos === "number" && duracaoMinutos > 0
-      ? Math.round(duracaoMinutos)
-      : 60;
+  const _duracaoNum = Number(duracaoMinutos);
+  const duracao = Number.isFinite(_duracaoNum) && _duracaoNum > 0 ? Math.round(_duracaoNum) : 60;
 
   if (!clienteId || typeof clienteId !== "string") {
     return errorResponse("O campo 'clienteId' é obrigatório", 400);

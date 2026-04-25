@@ -284,7 +284,7 @@ export default function NovoAgendamentoPage() {
                 onValueChange={(value) => {
                   field.onChange(value);
                   const found = servicos.find((s) => s.nome === value);
-                  setDuracaoMinutos(found?.duracao ?? 60);
+                  setDuracaoMinutos(Number(found?.duracao) || 60);
                 }}
               >
                 <SelectTrigger className="w-full rounded-lg border-neutral-200 bg-white py-2.5 text-sm text-neutral-900 focus-visible:border-neutral-400 focus-visible:ring-2 focus-visible:ring-neutral-100">
