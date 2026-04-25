@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Eye01Icon } from "@hugeicons/core-free-icons";
+import { EyeIcon } from "@hugeicons/core-free-icons";
 import {
   Dialog,
   DialogContent,
@@ -100,7 +100,7 @@ export default function AgendamentoCard({ ag }: Props) {
           aria-label="Ver detalhes"
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
         >
-          <HugeiconsIcon icon={Eye01Icon} size={16} color="currentColor" />
+          <HugeiconsIcon icon={EyeIcon} size={16} color="currentColor" />
         </button>
 
         {/* Menu de ações */}
