@@ -366,19 +366,31 @@ export default function CalendarioPage() {
                     }}
                     className="flex flex-col justify-start overflow-hidden rounded-lg border border-green-200 bg-green-50 px-3 py-1.5 text-left transition-colors hover:bg-green-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400"
                   >
-                    <p className="truncate text-sm font-medium text-green-900">
-                      {ag.cliente.nome}
-                    </p>
-                    {cardHeight >= 52 && (
-                      <p className="truncate text-xs text-green-700">
-                        {ag.servico} · {ag.profissional.nome}
-                      </p>
-                    )}
-                    {cardHeight >= 76 && (
-                      <p className="text-[11px] text-green-600">
-                        {fmtTime(ag.dataHora)} — {ag.duracaoMinutos ?? 60} min
-                      </p>
-                    )}
+                    <div className="flex flex-col overflow-hidden" style={{ height: "100%" }}>
+                      {cardHeight < 52 ? (
+                        // Card muito pequeno: tudo numa linha, sem quebrar
+                        <p className="truncate text-green-900" style={{ fontSize: 11 }}>
+                          {ag.cliente.nome} · {ag.servico} · {ag.profissional.nome}
+                        </p>
+                      ) : (
+                        <>
+                          {/* Linha 1: nome do cliente */}
+                          <p className="truncate font-medium text-green-900" style={{ fontSize: 12 }}>
+                            {ag.cliente.nome}
+                          </p>
+                          {/* Linha 2: serviço · profissional */}
+                          <p className="truncate text-green-700" style={{ fontSize: 11 }}>
+                            {ag.servico} · {ag.profissional.nome}
+                          </p>
+                          {/* Linha 3: horário e duração — só se houver espaço */}
+                          {cardHeight >= 76 && (
+                            <p className="truncate text-green-600" style={{ fontSize: 11, opacity: 0.7 }}>
+                              {fmtTime(ag.dataHora)} — {ag.duracaoMinutos ?? 60} min
+                            </p>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </button>
                 );
               })}
