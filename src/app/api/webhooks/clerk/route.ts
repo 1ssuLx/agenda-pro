@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
+import { clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 
 type EmailAddress = { email_address: string; id: string };
@@ -97,6 +98,8 @@ export async function POST(request: Request) {
     const slugSuffix = id.slice(-8);
     const slug = `${slugBase}-${slugSuffix}`;
 
+    const trialTerminaEm = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
     const tenant = await prisma.tenant.create({
       data: {
         nome: fullName,
@@ -104,6 +107,7 @@ export async function POST(request: Request) {
         telefone,
         mensagemLembrete:
           "Olá, {nome}! 👋\nLembrando do seu agendamento:\n🍽️ Serviço: {servico}\n👤 Profissional: {profissional}\n📅 Data: {data}\n✅ Confirme presença: {link}",
+        trialTerminaEm,
       },
     });
 
@@ -113,6 +117,14 @@ export async function POST(request: Request) {
         nome: fullName,
         email: primaryEmail,
         role: "dono",
+      },
+    });
+
+    const client = await clerkClient();
+    await client.users.updateUserMetadata(id, {
+      publicMetadata: {
+        plano: "trial",
+        trialTerminaEm: trialTerminaEm.toISOString(),
       },
     });
 

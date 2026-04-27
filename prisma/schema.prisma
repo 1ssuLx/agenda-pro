@@ -17,6 +17,10 @@ model Tenant {
   servicos             String?
   mensagemLembrete     String?
   onboardingCompleted  Boolean  @default(false)
+  plano                String   @default("trial")
+  trialTerminaEm       DateTime?
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
   profissionais Profissional[]
   clientes      Cliente[]
   agendamentos  Agendamento[]
