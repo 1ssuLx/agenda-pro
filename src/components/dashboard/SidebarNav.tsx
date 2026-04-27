@@ -8,6 +8,7 @@ import {
   Calendar01Icon,
   Calendar03Icon,
   UserGroup02Icon,
+  CreditCardAcceptIcon,
   Settings01Icon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,7 @@ const links = [
   { href: "/dashboard/agendamentos", label: "Agendamentos", icon: Calendar01Icon },
   { href: "/dashboard/calendario", label: "Calendário", icon: Calendar03Icon },
   { href: "/dashboard/clientes", label: "Clientes", icon: UserGroup02Icon },
+  { href: "/dashboard/plano", label: "Meu Plano", icon: CreditCardAcceptIcon },
   { href: "/dashboard/configuracoes", label: "Configurações", icon: Settings01Icon },
 ];
 
