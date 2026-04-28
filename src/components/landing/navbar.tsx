@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
+import { useInterest } from "./interest-context";
 
 const LINKS = [
   { href: "#como-funciona", label: "Como funciona" },
@@ -11,6 +12,7 @@ const LINKS = [
 ];
 
 export function Navbar() {
+  const { setOpen } = useInterest();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -59,12 +61,13 @@ export function Navbar() {
             >
               Entrar
             </Link>
-            <Link
-              href="/sign-up"
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
               className="btn-shine rounded-full px-4 py-2 text-sm font-medium text-white"
             >
               Testar grátis
-            </Link>
+            </button>
           </div>
 
           {/* Mobile hamburger */}
@@ -133,13 +136,13 @@ export function Navbar() {
                 >
                   Entrar
                 </Link>
-                <Link
-                  href="/sign-up"
-                  onClick={() => setMobileOpen(false)}
+                <button
+                  type="button"
+                  onClick={() => { setMobileOpen(false); setOpen(true); }}
                   className="btn-shine rounded-full px-6 py-3 text-sm font-medium text-white"
                 >
                   Testar grátis
-                </Link>
+                </button>
               </div>
             </motion.div>
           </motion.div>

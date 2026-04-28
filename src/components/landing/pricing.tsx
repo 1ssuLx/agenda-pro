@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { useInterest } from "./interest-context";
 
 const FEATURES = [
   "Agendamentos ilimitados",
@@ -14,6 +14,7 @@ const FEATURES = [
 ];
 
 export function Pricing() {
+  const { setOpen } = useInterest();
 
   return (
     <section id="preco" className="relative px-6 py-32">
@@ -79,12 +80,13 @@ export function Pricing() {
                 ))}
               </ul>
 
-              <Link
-                href="/sign-up"
+              <button
+                type="button"
+                onClick={() => setOpen(true)}
                 className="btn-shine mt-10 flex w-full items-center justify-center gap-2 rounded-xl px-6 py-4 text-sm font-medium text-white shadow-[0_20px_60px_rgba(34,197,94,0.3)]"
               >
                 Começar 30 dias grátis →
-              </Link>
+              </button>
 
               <p className="mt-4 text-center text-[11px] text-[#525252]">
                 Sem cartão · cancele quando quiser

@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { useInterest } from "./interest-context";
 
 export function FinalCTA() {
+  const { setOpen } = useInterest();
 
   return (
     <section className="relative flex min-h-[80vh] items-center justify-center overflow-hidden px-6 py-32">
@@ -24,12 +25,13 @@ export function FinalCTA() {
           30 dias grátis. Sem cartão. Sem pegadinha. Só agenda cheia.
         </p>
         <div className="mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            href="/sign-up"
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
             className="btn-shine inline-flex items-center justify-center gap-2 rounded-full px-8 py-4 text-sm font-medium text-white shadow-[0_20px_60px_rgba(34,197,94,0.4)]"
           >
             Garantir minha vaga grátis →
-          </Link>
+          </button>
           <a
             href="#preco"
             className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-8 py-4 text-sm text-white transition-colors hover:bg-white/5"
