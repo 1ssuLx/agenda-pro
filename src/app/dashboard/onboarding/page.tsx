@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 type Servico = { nome: string; duracao: number };
@@ -251,32 +259,56 @@ export default function OnboardingPage() {
                 </ul>
               )}
 
-              <div className="flex flex-col gap-3 rounded-xl border border-dashed border-neutral-200 p-4">
-                <p className="text-sm font-medium text-neutral-700">Adicionar serviço</p>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={servicoNome}
-                    onChange={(e) => { setServicoNome(e.target.value); setErroServico(""); }}
-                    onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
-                    placeholder="Nome do serviço"
-                    className={cn(inputClass, "flex-1 min-w-0")}
-                  />
-                  <input
-                    type="number"
-                    value={servicoDuracao}
-                    onChange={(e) => { setServiceDuracao(e.target.value); setErroServico(""); }}
-                    onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
-                    placeholder="Min"
-                    min={1}
-                    className={cn(inputClass, "w-20 shrink-0")}
-                  />
-                  <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={adicionarServico}>
-                    Adicionar
-                  </Button>
+              <TooltipProvider>
+                <div className="flex flex-col gap-3 rounded-xl border border-dashed border-neutral-200 p-4">
+                  <p className="text-sm font-medium text-neutral-700">Adicionar serviço</p>
+                  <div className="grid grid-cols-[1fr_5rem] gap-2">
+                    <label className="text-xs font-medium text-neutral-500">Nome do serviço</label>
+                    <div className="flex items-center gap-1">
+                      <label className="text-xs font-medium text-neutral-500">Duração (min)</label>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className="cursor-default text-neutral-400">
+                            <HugeiconsIcon icon={InformationCircleIcon} size={14} color="currentColor" />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent side="top">
+                          Coloque o tempo médio que você leva para realizar este serviço.
+                          Ex: Corte simples = 30 min, Coloração = 120 min
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={servicoNome}
+                      onChange={(e) => { setServicoNome(e.target.value); setErroServico(""); }}
+                      onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
+                      placeholder="Ex: Corte simples"
+                      className={cn(inputClass, "flex-1 min-w-0")}
+                    />
+                    <input
+                      type="number"
+                      value={servicoDuracao}
+                      onChange={(e) => { setServiceDuracao(e.target.value); setErroServico(""); }}
+                      onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
+                      placeholder="30"
+                      min={1}
+                      className={cn(inputClass, "w-20 shrink-0")}
+                    />
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="shrink-0 bg-neutral-900 text-white hover:bg-neutral-700"
+                      onClick={adicionarServico}
+                    >
+                      Adicionar
+                    </Button>
+                  </div>
+                  {erroServico && <p className="text-xs text-red-600">{erroServico}</p>}
                 </div>
-                {erroServico && <p className="text-xs text-red-600">{erroServico}</p>}
-              </div>
+              </TooltipProvider>
             </>
           )}
 

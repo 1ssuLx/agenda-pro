@@ -2,7 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 interface Servico {
@@ -335,31 +343,55 @@ export default function ConfiguracoesPage() {
           <p className="text-sm text-neutral-400">Nenhum serviço cadastrado ainda.</p>
         )}
 
-        <div className="mt-4 rounded-xl border border-dashed border-neutral-200 p-4">
-          <p className="mb-3 text-sm font-medium text-neutral-700">Adicionar serviço</p>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={novoServicoNome}
-              onChange={(e) => setNovoServicoNome(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
-              placeholder="Nome do serviço"
-              className={cn(inputClass, "flex-1 min-w-0")}
-            />
-            <input
-              type="number"
-              value={novoServicoDuracao}
-              onChange={(e) => setNovoServicoDuracao(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
-              placeholder="Min"
-              min={1}
-              className={cn(inputClass, "w-20 shrink-0")}
-            />
-            <Button type="button" variant="outline" size="sm" className="shrink-0" onClick={adicionarServico}>
-              Adicionar
-            </Button>
+        <TooltipProvider>
+          <div className="mt-4 rounded-xl border border-dashed border-neutral-200 p-4">
+            <p className="mb-3 text-sm font-medium text-neutral-700">Adicionar serviço</p>
+            <div className="grid grid-cols-[1fr_5rem] gap-2 mb-1">
+              <label className="text-xs font-medium text-neutral-500">Nome do serviço</label>
+              <div className="flex items-center gap-1">
+                <label className="text-xs font-medium text-neutral-500">Duração (min)</label>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="cursor-default text-neutral-400">
+                      <HugeiconsIcon icon={InformationCircleIcon} size={14} color="currentColor" />
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    Coloque o tempo médio que você leva para realizar este serviço.
+                    Ex: Corte simples = 30 min, Coloração = 120 min
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={novoServicoNome}
+                onChange={(e) => setNovoServicoNome(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
+                placeholder="Ex: Corte simples"
+                className={cn(inputClass, "flex-1 min-w-0")}
+              />
+              <input
+                type="number"
+                value={novoServicoDuracao}
+                onChange={(e) => setNovoServicoDuracao(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && adicionarServico()}
+                placeholder="30"
+                min={1}
+                className={cn(inputClass, "w-20 shrink-0")}
+              />
+              <Button
+                type="button"
+                size="sm"
+                className="shrink-0 bg-neutral-900 text-white hover:bg-neutral-700"
+                onClick={adicionarServico}
+              >
+                Adicionar
+              </Button>
+            </div>
           </div>
-        </div>
+        </TooltipProvider>
       </Section>
 
       {/* Seção 4 — Mensagem do lembrete */}

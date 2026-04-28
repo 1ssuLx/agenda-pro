@@ -4,6 +4,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import SidebarNav from "@/components/dashboard/SidebarNav";
 import TrialBanner from "./_components/TrialBanner";
+import PhoneBanner from "./_components/PhoneBanner";
 
 export default async function DashboardLayout({
   children,
@@ -42,6 +43,7 @@ export default async function DashboardLayout({
       </header>
 
       <TrialBanner />
+      <PhoneBanner />
 
       <div className="flex flex-1">
         <div className="hidden md:flex w-56 shrink-0 flex-col border-r border-neutral-200 bg-white">
