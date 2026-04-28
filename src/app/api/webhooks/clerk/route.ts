@@ -2,7 +2,9 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { Webhook } from "svix";
 import { clerkClient } from "@clerk/nextjs/server";
+import { tasks } from "@trigger.dev/sdk/v3";
 import { prisma } from "@/lib/prisma";
+import type { lembreteTrial7, lembreteTrial23, lembreteTrial29 } from "@/trigger/lembretesTrial";
 
 type EmailAddress = { email_address: string; id: string };
 
@@ -127,6 +129,24 @@ export async function POST(request: Request) {
         trialTerminaEm: trialTerminaEm.toISOString(),
       },
     });
+
+    await Promise.all([
+      tasks.trigger<typeof lembreteTrial7>(
+        "lembrete-trial-dia-7",
+        { tenantId: tenant.id },
+        { delay: "7d" }
+      ),
+      tasks.trigger<typeof lembreteTrial23>(
+        "lembrete-trial-dia-23",
+        { tenantId: tenant.id },
+        { delay: "23d" }
+      ),
+      tasks.trigger<typeof lembreteTrial29>(
+        "lembrete-trial-dia-29",
+        { tenantId: tenant.id },
+        { delay: "29d" }
+      ),
+    ]);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useInterest } from "./interest-context";
 
@@ -14,6 +15,7 @@ function maskWhatsapp(raw: string): string {
 
 export function InterestModal() {
   const { open, setOpen } = useInterest();
+  const router = useRouter();
   const [nome, setNome] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,6 +36,15 @@ export function InterestModal() {
       return () => clearTimeout(t);
     }
   }, [open]);
+
+  // Redirect to /sign-up after showing success message
+  useEffect(() => {
+    if (!sucesso) return;
+    const t = setTimeout(() => {
+      router.push("/sign-up");
+    }, 2000);
+    return () => clearTimeout(t);
+  }, [sucesso, router]);
 
   // ESC + body lock
   useEffect(() => {
@@ -219,15 +230,8 @@ export function InterestModal() {
                   </motion.div>
                   <h3 className="font-serif text-3xl text-white">Recebido! ✓</h3>
                   <p className="mt-3 max-w-sm text-sm text-[#a3a3a3]">
-                    Entraremos em contato pelo WhatsApp em até 24h. Fique de olho!
+                    Ótimo! Agora crie sua conta para começar. Redirecionando em instantes…
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="mt-7 rounded-xl border border-white/10 px-5 py-2.5 text-sm text-white hover:bg-white/5 transition-colors"
-                  >
-                    Fechar
-                  </button>
                 </motion.div>
               )}
             </AnimatePresence>

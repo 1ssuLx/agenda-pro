@@ -1,7 +1,7 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
+import { useInterest } from "./interest-context";
 
 const container = {
   hidden: {},
@@ -13,6 +13,7 @@ const item = {
 };
 
 export function Hero() {
+  const { setOpen } = useInterest();
 
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden px-6 pt-32 pb-20">
@@ -62,12 +63,13 @@ export function Hero() {
           </motion.p>
 
           <motion.div variants={item} className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <Link
-              href="/sign-up"
+            <button
+              type="button"
+              onClick={() => setOpen(true)}
               className="btn-shine inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-sm font-medium text-white shadow-[0_20px_60px_rgba(34,197,94,0.35)]"
             >
               Garantir minha vaga grátis →
-            </Link>
+            </button>
             <a
               href="#como-funciona"
               className="inline-flex items-center justify-center gap-2 rounded-full border border-white/10 px-7 py-4 text-sm text-white transition-colors hover:bg-white/5"
